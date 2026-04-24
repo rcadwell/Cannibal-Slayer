@@ -1,26 +1,5 @@
-# Virtual Environment
 venv/
-ENV/
-env/
-
-# Python bytecode
+venv_win/
+venv_final/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
-
-# Unit test / coverage reports
-.pytest_cache/
-.coverage
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Ursina / Panda3D logs
-*.log
