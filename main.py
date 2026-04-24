@@ -45,7 +45,7 @@ weapons = {
         "unlocked": False,
         "damage": 9999, # Insta-kill
         "range": 200,
-        "texture": "vaporizer_texture"
+        "texture": "goybeam_texture"
     }
 }
 
@@ -140,41 +140,81 @@ player.cursor.color = color.red  # Your crosshair
 
 # --- Enemy/Sprite Setup ---
 # This is a 3D sprite: a 2D quad that always faces you
-enemy = Entity(
+class Enemy(Entity):
+    def __init__(self, pos):
+        super().__init__(
+            model='quad',
+            texture='vertical_gradient', # Replace with your enemy image later
+            position=pos,
+            scale=(1, 2),
+            billboard=True,
+            collider='box',
+            color=color.red
+        )
+        self.health = 100
+        self.speed = 2
+
+enemies = []
+enemies.append(Enemy(pos=(5, 1, 10)))
+enemies.append(Enemy(pos=(-5, 1, 12)))
+
+weapon_sprite = Entity(
+    parent=camera.ui,
     model='quad',
-    texture='vertical_gradient', # Replace with your enemy image later
-    position=(5, 1, 10),
-    scale=(1, 2),
-    billboard=True,
-    collider='box'
+    texture=weapons[current_weapon]["texture"],
+    scale=(0.4, 0.2),
+    position=(0, -0.4)
 )
 
 def input(key):
+    global current_weapon
+
+    key_map = {
+        '1': 'fists', 
+        '2': 'pistol', 
+        '3': 'chaingun', 
+        '4': 'shotgun', 
+        '5': 'chainsaw', 
+        '6': 'plasma_rifle', 
+        '7': 'goybeam'
+    }
+
+    if key in key_map:
+        selection = key_map[key]
+        if weapons[selection]["unlocked"]:
+            current_weapon = selection
+            weapon_sprite.texture = weapons[current_weapon]["texture"]
     if key == 'left mouse down':
+        shoot()
         # Play a sound here later!
         print("Bang!")
-        
-        # Check if we hit the enemy
-        if mouse.hovered_entity == enemy:
-            print("Direct hit!")
-            destroy(enemy)
 
 def shoot():
     # Logic for checking hits
     hit_info = raycast(camera.world_position, camera.forward, distance=weapons[current_weapon]["range"])
-    if hit_info.hit:
-        # Check if the thing we hit is an enemy
-        # destroy(hit_info.entity)
-        pass
+    
+    if hit_info.hit in enemies:
+        print("Enemy Hit!")
+        hit_info.entity.health -= weapons[current_weapon]["damage"]
+        
+        if hit_info.entity.health <= 0:
+            enemies.remove(hit_info.entity)
+            destroy(hit_info.entity)
 
 def update():
     global shoot_cooldown
+    # HANDLE ENEMY AI
+    for e in enemies:
+        dist = distance(e.position, player.position)
+        if 2 < dist < 20:
+            e.look_at(Vec3(player.position.x, e.y, player.position.z))
+            e.position += e.forward * time.dt * e.speed
 
-    #Reduce the cooldown timer over time
+    # HANDLE WEAPON COOLDOWN
     if shoot_cooldown > 0:
         shoot_cooldown -= time.dt
 
-    # Check if the left mouse button is HELD DOWN
+    # HANDLE RAPID FIRE
     if mouse.left and shoot_cooldown <= 0:
         if current_weapon == "chaingun":
             shoot()
