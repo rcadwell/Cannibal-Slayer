@@ -108,20 +108,38 @@ wall_front = Entity(
     color=color.dark_gray
     )
 
-wall_left = Entity(
+wall_left_part1 = Entity(
     model='cube',
     collider='box',
-    position=(-5, 3, 0),
-    scale=(0.2, 6, 10),
+    position=(-5, 3, -3),
+    scale=(0.2, 6, 4),
     texture='brick',
     color=color.dark_gray
     )
 
-wall_right = Entity(
+wall_left_part2 = Entity(
     model='cube',
     collider='box',
-    position=(5, 3, 0),
-    scale=(0.2, 6, 10),
+    position=(-5, 3, 3),
+    scale=(0.2, 6, 5),
+    texture='brick',
+    color=color.dark_gray
+)
+
+wall_right_part1 = Entity(
+    model='cube',
+    collider='box',
+    position=(5, 3, 3),
+    scale=(0.2, 6, 4),
+    texture='brick',
+    color=color.dark_gray
+    )
+
+wall_right_part2 = Entity(
+    model='cube',
+    collider='box',
+    position=(5, 3, -3),
+    scale=(0.2, 6, 4),
     texture='brick',
     color=color.dark_gray
     )
@@ -157,6 +175,14 @@ class Enemy(Entity):
 enemies = []
 enemies.append(Enemy(pos=(5, 1, 10)))
 enemies.append(Enemy(pos=(-5, 1, 12)))
+# Boss enemy
+boss = Enemy(pos=(0, 5, 0))
+boss.scale = (5, 10)
+boss.health = 2000
+boss.speed = 1
+boss.color = color.gold
+enemies.append(boss)
+
 
 weapon_sprite = Entity(
     parent=camera.ui,
