@@ -15,19 +15,22 @@ weapons = {
         "unlocked": True,
         "damage": 20,
         "range": 50, 
-        "texture": "pistol_texture"
+        "texture": "pistol_texture",
+        "ammo": 20
     },
     "chaingun": {
         "unlocked": True,
         "damage": 20,
         "range": 150,
-        "texture": "chaingun_texture"
+        "texture": "chaingun_texture",
+        "ammo": 80
     },
     "shotgun": {
         "unlocked": False,
         "damage": 100, #High damage, short range
         "range": 15,
-        "texture": "shotgun_texture"
+        "texture": "shotgun_texture",
+        "ammo": 50
     },
     "chainsaw": {
         "unlocked": False,
@@ -147,16 +150,16 @@ wall_right_part2 = Entity(
 dome = Entity(
     model='sphere',
     color=color.gold,
-    position=(0, 6, 0),
-    scale=12,
+    position=(0, 8, 0),
+    scale=10,
     texture='white_cube'
 )
 
 secret_wall = Entity(
     model='cube', 
-    color=color.red, 
     position=(0, 3, 15),
-    scale=0.5,
+    scale=(5, 6, 0.2),
+    collider='box',
     color=color.dark_gray
 )
         
@@ -166,6 +169,12 @@ secret_button = Entity(
     position=(2, 1, 5),
     scale=0.5,
     color=color.red
+)
+
+room_light = PointLight(
+    position=(10, 5, 10),
+    color=color.red,
+    range=20
 )
 
 # --- Player Setup ---
@@ -233,7 +242,7 @@ def input(key):
 
 def shoot():
     # Logic for checking hits
-    if current_weapon == "fists" or weapons[current_weapon]["ammo"] > 0:
+    if current_weapon == "fists" or current_weapon == "chainsaw" or weapons[current_weapon]["ammo"] > 0:
         if current_weapon != "fists": 
             weapons[current_weapon]["ammo"] -= 1
         hit_info = raycast(camera.world_position, camera.forward, distance=weapons[current_weapon]["range"])
@@ -277,6 +286,6 @@ def update():
             shoot_cooldown = 0.2 # Slightly slower fire rate
 
     if player.y < -5:
-        player.position = (0, 0, 0)
+        player.position = (0, 0, -8)
 
 app.run()
