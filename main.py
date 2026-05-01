@@ -152,6 +152,22 @@ dome = Entity(
     texture='white_cube'
 )
 
+secret_wall = Entity(
+    model='cube', 
+    color=color.red, 
+    position=(0, 3, 15),
+    scale=0.5,
+    color=color.dark_gray
+)
+        
+secret_button = Entity(
+    model='cube',
+    collider='box',
+    position=(2, 1, 5),
+    scale=0.5,
+    color=color.red
+)
+
 # --- Player Setup ---
 player = FirstPersonController()
 player.cursor.color = color.red  # Your crosshair
@@ -217,15 +233,26 @@ def input(key):
 
 def shoot():
     # Logic for checking hits
-    hit_info = raycast(camera.world_position, camera.forward, distance=weapons[current_weapon]["range"])
+    if current_weapon == "fists" or weapons[current_weapon]["ammo"] > 0:
+        if current_weapon != "fists": 
+            weapons[current_weapon]["ammo"] -= 1
+        hit_info = raycast(camera.world_position, camera.forward, distance=weapons[current_weapon]["range"])
     
-    if hit_info.hit in enemies:
-        print("Enemy Hit!")
-        hit_info.entity.health -= weapons[current_weapon]["damage"]
-        
-        if hit_info.entity.health <= 0:
-            enemies.remove(hit_info.entity)
-            destroy(hit_info.entity)
+        if hit_info.hit:
+            if hit_info.entity in enemies:
+                print("Enemy Hit!")
+                hit_info.entity.health -= weapons[current_weapon]["damage"]
+                if hit_info.entity.health <= 0:
+                    enemies.remove(hit_info.entity)
+                    destroy(hit_info.entity)
+
+            elif hit_info.entity == secret_button:
+                destroy(secret_wall)
+                weapons["goybeam"]["unlocked"] = True
+                print("The Goybeam has been revealed!")
+def action():
+    print('Button is clicked')
+            
 
 def update():
     global shoot_cooldown
@@ -248,5 +275,8 @@ def update():
         elif current_weapon == "plasma_rifle":
             shoot()
             shoot_cooldown = 0.2 # Slightly slower fire rate
+
+    if player.y < -5:
+        player.position = (0, 0, 0)
 
 app.run()
